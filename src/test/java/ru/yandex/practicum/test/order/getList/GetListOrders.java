@@ -1,10 +1,13 @@
-package ru.yandex.practicum.test;
+package ru.yandex.practicum.test.order.getList;
 
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import io.qameta.allure.junit4.DisplayName;
 import org.example.model.Courier;
 import org.example.model.Order;
-import org.example.steps.CourierSteps;
-import org.example.steps.OrderSteps;
+import ru.yandex.practicum.test.BaseTest;
+import steps.CourierSteps;
+import steps.OrderSteps;
 import org.junit.After;
 import org.junit.Before;
 
@@ -14,10 +17,14 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.util.Random;
 
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+import static org.hamcrest.Matchers.greaterThan;
 
-public class OrderTest extends BaseTest{
+@Epic("Заказы")
+@Feature("Управление заказами")
+public class GetListOrders extends BaseTest {
     private CourierSteps courierSteps = new CourierSteps();
     private OrderSteps orderSteps = new OrderSteps();
     private Order order;
@@ -41,57 +48,12 @@ public class OrderTest extends BaseTest{
         courier.setPassword("pas"  + System.currentTimeMillis());
     }
 
-    @Test
-    @DisplayName("Create order test")
-    // Создаем заказ и не указываем цвета, код 201
-    public void ShouldCreateOrderTest(){
-        courierSteps
-                .createCourier(courier);
-        courierSteps
-                .login(courier);
-        orderSteps
-                .createOrder(order)
-                .statusCode(201)
-                .body("track", notNullValue());
-    }
-    @Test
-    @DisplayName("Create order test with color black or grey")
-    // Создаем заказ c цветом BLACK OR GREY, код 201
-    public void ShouldCreateOrderWithColorTest(){
-        courierSteps
-                .createCourier(courier);
-        courierSteps
-                .login(courier);
-        String[] color = new String[] { "BLACK", "GREY" };
-        int randomcolor = new Random().nextInt(color.length);
-        order.setColor(color);
-        orderSteps
-                .createOrder(order)
-                .statusCode(201)
-                .body("track", notNullValue());
-    }
-     // Создаем заказ. Указываем два цвета — BLACK и GREY
 
-     @Test
-     // Создаем заказ c цветом BLACK OR GREY, код 201
-     @DisplayName("Create order test with color black & grey")
-     public void ShouldCreateOrderWithTwoColorTest(){
-         courierSteps
-                 .createCourier(courier);
-         courierSteps
-                 .login(courier);
-         String[] color = new String[] { "BLACK", "GREY" };
-         order.setColor(color);
-         orderSteps
-                 .createOrder(order)
-                 .statusCode(201)
-                 .body("track", notNullValue());
-     }
 
     @Test
     @DisplayName("Get list order without courier id")
+    @Feature("Получение списка заказа без id курьера")
     // Получить список заказов, код 200
-    // Ошибка, код 200 <> 201
     public void ShouldGetOrdersListWithoutCourierIdTest(){
         courierSteps
                 .createCourier(courier);
@@ -102,11 +64,14 @@ public class OrderTest extends BaseTest{
         orderSteps
                 .getListOrders(order)
                 .statusCode(200)
-                .body("track", notNullValue());
+                .body("orders.size()", greaterThan(0))
+                .body("orders[0].id", notNullValue())
+                .body("orders[0].track", notNullValue());
     }
 
     @Test
     @DisplayName("Get list order without courier id & limit = 10")
+    @Feature("Получение списка заказа без id курьера и лимит = 10")
     // Получить список заказов, код 200
     public void ShouldGetOrdersListWithoutCourierIdWithLimitTest(){
         Integer limit = 10;
@@ -120,11 +85,14 @@ public class OrderTest extends BaseTest{
         orderSteps
                 .getListOrdersWithLimit(order, limit, page)
                 .statusCode(200)
-                .body("track", notNullValue());
+                .body("orders.size()", greaterThan(0))
+                .body("orders[0].id", notNullValue())
+                .body("orders[0].track", notNullValue());
     }
 
     @Test
     @DisplayName("Get list order  with courier id")
+    @Feature("Получение списка заказа с id  курьера")
     // Получить список заказов курьера, код 200
     public void ShouldGetOrdersListCourierTest(){
         courierSteps
@@ -138,13 +106,16 @@ public class OrderTest extends BaseTest{
         orderSteps
                 .listOrdersCourier(courier)
                 .statusCode(200)
-                .body("track", notNullValue());
+                .body("orders.size()", greaterThan(0))
+                .body("orders[0].id", notNullValue())
+                .body("orders[0].track", notNullValue());
     }
 
     @Test
     @DisplayName("Get list order  with courier id & on station")
+    @Feature("Получение списка заказов курьера на станциях из списка")
     // Получить список заказов курьера на станциях из списка, код 200
-    public void ShouldGetOrdersListCourierOnStationTest(){
+    public void shouldGetOrdersListCourierOnStationTest(){
           Integer[] nearestStation =  new Integer[] { 1, 2 };
         courierSteps
                 .createCourier(courier);
@@ -157,13 +128,16 @@ public class OrderTest extends BaseTest{
         orderSteps
                 .listOrdersCourierOnStation(courier, nearestStation)
                 .statusCode(200)
-                .body("track", notNullValue());
+                .body("orders.size()", greaterThan(0))
+                .body("orders[0].id", notNullValue())
+                .body("orders[0].track", notNullValue());
     }
 
     @Test
     @DisplayName("Get list order  with courier id & on station & limit")
+    @Feature("Получение списка заказов курьера на станциях из списка с лимитом")
     // Получить список заказов курьера на станциях из списка с лимитом, код 200
-    public void ShouldGetOrdersListCourierOnStationWithLimitTest(){
+    public void shouldGetOrdersListCourierOnStationWithLimitTest(){
         Integer limit = 10;
         Integer page = 0;
         Integer[] nearestStation =  new Integer[] { 1, 2 };
@@ -178,14 +152,17 @@ public class OrderTest extends BaseTest{
         orderSteps
                 .listOrdersCourierOnStationWithLimit(courier, nearestStation, limit, page)
                 .statusCode(200)
-                .body("track", notNullValue());
+                .body("orders.size()", greaterThan(0))
+                .body("orders[0].id", notNullValue())
+                .body("orders[0].track", notNullValue());
     }
 
     @After
     // Прибираем за собой
     @DisplayName("Clear order")
+    @Feature("Удаление заказа")
     public void tearDown(){
-        if (order == null) {
+        if (order != null) {
             Integer idOrder = orderSteps.createOrder(order)
                     .extract().body().path("track");
             if (idOrder == null) {
@@ -194,5 +171,6 @@ public class OrderTest extends BaseTest{
             }
         }
     }
+
 
 }

@@ -1,5 +1,6 @@
-package org.example.steps;
+package steps;
 
+import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import org.example.model.Courier;
 
@@ -12,7 +13,7 @@ public class CourierSteps {
     public static final String COURIERDELETE = "/api/v1/courier/{id}";
 
 
-
+    @Step("Создание курьера")
     public ValidatableResponse createCourier(Courier courier){
         return given()
                 .body(courier)
@@ -21,6 +22,7 @@ public class CourierSteps {
                 .then();
     }
 
+    @Step("Авторизация курьера")
     public ValidatableResponse login(Courier courier){
         return given()
                 .body(courier)
@@ -29,6 +31,7 @@ public class CourierSteps {
                 .then();
     }
 
+    @Step("Удаление курьера")
     public ValidatableResponse deleteCourier(Courier courier){
         return given()
                 .pathParams("id", courier.getId())
